@@ -10,23 +10,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ajbc.doodle.calendar.daos.DaoException;
-import ajbc.doodle.calendar.entities.Category;
-import ajbc.doodle.calendar.services.CategoryService;
+import ajbc.doodle.calendar.entities.User;
+import ajbc.doodle.calendar.services.UserService;
 
 
 
 @RestController
-@RequestMapping("categories")
-public class CategoryController {
+@RequestMapping("users")
+public class UserController {
 
 	@Autowired
-	private CategoryService catService;
+	private UserService userService;
 	
 	@GetMapping
-	public ResponseEntity<?> getCategories(){
+	public ResponseEntity<?> getUsers(){
 		try {
-			List<Category> catList = catService.getAllCategory();
-			return ResponseEntity.ok(catList);
+			List<User> usersList = userService.getAllUsers();
+			return ResponseEntity.ok(usersList);
 		} catch (DaoException e) {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e);
 		}

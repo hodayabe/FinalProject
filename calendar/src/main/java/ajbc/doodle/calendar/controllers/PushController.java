@@ -43,6 +43,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ajbc.doodle.calendar.Application;
 import ajbc.doodle.calendar.ServerKeys;
 import ajbc.doodle.calendar.entities.Notification;
+import ajbc.doodle.calendar.entities.Unit;
 import ajbc.doodle.calendar.entities.webpush.PushMessage;
 import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;
@@ -122,7 +123,7 @@ public class PushController {
 		counter++;
 		try {
 			
-			Notification notification = new Notification(counter, LocalDateTime.now(), "Test notification", "Test message");
+			Notification notification = new Notification(counter, LocalDateTime.now(), "Test notification", "Test message",Unit.MINUTES,1);
 			sendPushMessageToAllSubscribers(this.subscriptions, new PushMessage("message: " + counter, notification.toString()));
 			System.out.println(notification);
 		} catch (JsonProcessingException e) {
