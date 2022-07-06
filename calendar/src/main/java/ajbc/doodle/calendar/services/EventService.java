@@ -1,29 +1,23 @@
 package ajbc.doodle.calendar.services;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.daos.EventDao;
 import ajbc.doodle.calendar.entities.Event;
 
-
-@Service
+@Component()
 public class EventService {
 
 	@Autowired
-	@Qualifier("htEDao")
-	EventDao eventDao;
+	private EventDao eventDao;
 
-	public void addEvent(Integer userId , Event event) throws DaoException{
-		eventDao.addEvent(userId,event);
+	public void addEvent(Event event, Integer userId) throws DaoException {
+		eventDao.addEvent(event);
 	}
-	
-	
-	public List<Event> getAllEvents() throws DaoException{
-		return eventDao.getAllEvents();
+
+	public Event getEventbyId(Integer eventId) throws DaoException {
+		return eventDao.getEventById(eventId);
 	}
 }
