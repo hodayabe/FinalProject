@@ -71,6 +71,9 @@ public class UserController {
 			 return ResponseEntity.ok(user);
 		}
 		
+		else if(keys.contains("start")&&keys.contains("end") )
+			list = service.getUsersWithEventInRange(map.get("start"),map.get("end"));
+		
 		else if (keys.contains("eventId"))
 			list = service.getUsersByEvent(Integer.parseInt(map.get("eventId")));
 		
@@ -83,6 +86,26 @@ public class UserController {
 
 		return ResponseEntity.ok(list);
 	}
+	
+	
+	@RequestMapping(method = RequestMethod.DELETE, path="/{id}")
+	public ResponseEntity<User>  DeleteUser(@PathVariable Integer id ,@RequestParam Map<String, String> map ) throws DaoException {
+		Set<String> keys = map.keySet();
+		User user=null;
+		
+		if (keys.contains("soft"))
+			user= service.softDeleteUser(id);
+		
+		if (keys.contains("hard"))
+			user= service.hardDeleteUser(id);
+		
+	
+		if(user == null)
+			return ResponseEntity.notFound().build();
+			
+		return ResponseEntity.ok(user);
+	}
+	
 	
 	
 	

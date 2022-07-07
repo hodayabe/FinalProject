@@ -1,6 +1,5 @@
 package ajbc.doodle.calendar.daos;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +24,12 @@ public interface UserDao {
 	}
 	
 	@Transactional(readOnly = false)
-	public default void deleteUser(Integer userId) throws DaoException {
+	public default User softDeleteUser(Integer userId) throws DaoException {
+		throw new DaoException("Method not implemented");
+	}
+	
+	@Transactional(readOnly = false)
+	public default User hardDeleteUser(Integer userId) throws DaoException {
 		throw new DaoException("Method not implemented");
 	}
 	
@@ -39,7 +43,7 @@ public interface UserDao {
 		throw new DaoException("Method not implemented");
 	}
 	
-	public default List<User> getUsersWithEventInRange(LocalDateTime start, LocalDateTime end) throws DaoException {
+	public default List<User> getUsersWithEventInRange(String start, String end) throws DaoException {
 		
 		throw new DaoException("Method not implemented");
 	}
@@ -48,5 +52,8 @@ public interface UserDao {
 		
 		throw new DaoException("Method not implemented");
 	}
+	
+	
+	
 
 }

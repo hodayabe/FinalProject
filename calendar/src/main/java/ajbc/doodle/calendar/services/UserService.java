@@ -1,11 +1,9 @@
 package ajbc.doodle.calendar.services;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import ajbc.doodle.calendar.daos.DaoException;
@@ -14,7 +12,6 @@ import ajbc.doodle.calendar.daos.UserDao;
 import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.User;
 
-//@Component
 @Service
 public class UserService {
 
@@ -39,6 +36,10 @@ public class UserService {
 		return userDao.getAllUsers();
 	}
 
+	public List<User> getUsersWithEventInRange(String start, String end ) throws DaoException {
+		return userDao.getUsersWithEventInRange(start,end);
+	}
+	
 	public void updateUser(User user) throws DaoException {
 		userDao.updateUser(user);
 	}
@@ -53,6 +54,15 @@ public class UserService {
 
 	public User getUserByEmail(String email) throws DaoException {
 		return userDao.getUserByEmail(email);
+	}
+	
+	
+	public User softDeleteUser(Integer userId) throws DaoException {
+		return userDao.softDeleteUser(userId);
+	}
+
+	public User hardDeleteUser(Integer userId) throws DaoException {
+		return userDao.hardDeleteUser(userId);
 	}
 
 }

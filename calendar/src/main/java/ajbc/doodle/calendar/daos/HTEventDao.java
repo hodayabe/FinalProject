@@ -34,6 +34,7 @@ public class HTEventDao implements EventDao {
 			throw new DaoException("No Such Event in DB");
 		return ev;
 	}
+	
 	@Override
 	public void deleteEvent(Integer eventId) throws DaoException {
 		Event ev = getEvent(eventId);
@@ -41,6 +42,8 @@ public class HTEventDao implements EventDao {
 		updateEvent(ev);
 	}
 
+	
+	
 		@Override
 		public List<Event> getAllEvent() throws DaoException {
 			DetachedCriteria criteria = DetachedCriteria.forClass(Event.class);
@@ -49,5 +52,8 @@ public class HTEventDao implements EventDao {
 				throw new DaoException("No event found in DB");
 			return eventList;
 		}
+		
+		
+		
 
 }
