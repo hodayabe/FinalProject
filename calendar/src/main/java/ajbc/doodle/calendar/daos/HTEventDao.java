@@ -4,54 +4,50 @@ import java.util.List;
 import org.hibernate.criterion.DetachedCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.HibernateTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import ajbc.doodle.calendar.entities.Event;
 
-
 @SuppressWarnings("unchecked")
-@Component(value = "htEDao")
-public class HTEventDao implements EventDao{
+@Repository("htEDao")
+public class HTEventDao implements EventDao {
 
 	@Autowired
 	private HibernateTemplate template;
 
-	// CRUD
+
+	//CRUD operations
 	@Override
 	public void addEvent(Event event) throws DaoException {
 		template.persist(event);
 	}
 
-	// Queries
 	
 	@Override
-	public Event getEventById(Integer eventId) throws DaoException {
-		Event event = template.get(Event.class, eventId);
-		if(event == null)
-			throw new DaoException("Event doesnt exists");
-		return event;
+	public void updateEvent(Event event) throws DaoException {
+		template.merge(event);
 	}
-
 	@Override
-	public List<Event> getAllEvents() throws DaoException {
-		DetachedCriteria criteria = DetachedCriteria.forClass(Event.class);
-		return (List<Event>) template.findByCriteria(criteria);
+	public Event getEvent(Integer eventId) throws DaoException {
+		Event ev = template.get(Event.class, eventId);
+		if (ev ==null)
+			throw new DaoException("No Such Event in DB");
+		return ev;
 	}
-	
-	
-	
-	
+	@Override
+	public void deleteEvent(Integer eventId) throws DaoException {
+		Event ev = getEvent(eventId);
+		ev.setDiscontinued(1);
+		updateEvent(ev);
+	}
 
-	
+		@Override
+		public List<Event> getAllEvent() throws DaoException {
+			DetachedCriteria criteria = DetachedCriteria.forClass(Event.class);
+			List<Event> eventList = (List<Event>)template.findByCriteria(criteria);
+			if(eventList==null)
+				throw new DaoException("No event found in DB");
+			return eventList;
+		}
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }

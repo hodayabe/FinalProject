@@ -11,6 +11,10 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,7 +41,10 @@ public class User {
 	private LocalDate joinDate;
 	private Integer isActive;
 	
-	@ManyToMany(mappedBy="guests",cascade = {CascadeType.MERGE})
+//	@JsonIgnore
+	@JsonBackReference("guests")
+//	@JsonManagedReference("events")
+	@ManyToMany(mappedBy="guests",cascade = {CascadeType.MERGE,CascadeType.REFRESH})
 	List<Event> events;
 	
 	public User(String fristName, String lastName, String email, LocalDate birthDate, LocalDate joinDate,
