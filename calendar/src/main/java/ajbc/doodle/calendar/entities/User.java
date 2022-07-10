@@ -1,9 +1,11 @@
 package ajbc.doodle.calendar.entities;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,9 +13,16 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+//import org.hibernate.FetchMode;
+//import org.hibernate.annotations.Fetch;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,26 +43,47 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer userId;
 	
-	private String lastName;
 	private String firstName;
+	private String lastName;
+	
+	@Column(unique = true)
 	private String email;
+	
 	private LocalDate birthDate;
 	private LocalDate joinDate;
 	private Integer isActive;
+	private Integer loggedIn;
 	
-//	@JsonIgnore
-	@JsonBackReference("guests")
-//	@JsonManagedReference("events")
+
+//	private  String endpoint;
+//	private  String p256dh;
+//	private  String auth;
+	
+//	@JsonProperty(access = Access.AUTO)
+//	@Fetch(FetchMode.JOIN)
 	@ManyToMany(mappedBy="guests",cascade = {CascadeType.MERGE,CascadeType.REFRESH})
-	List<Event> events;
+	@JsonIgnore
+	private Set<Event> events = new HashSet<Event>();
 	
-	public User(String fristName, String lastName, String email, LocalDate birthDate, LocalDate joinDate,
-			Integer isActive) {
+	
+	
+	public void loggIn(boolean bool) {
+		if(bool)
+			setLoggedIn(1);
+		
+		else
+			setLoggedIn(0);
+	}
+	
+	public User(String fristName, String lastName, String email, LocalDate birthDate, LocalDate joinDate) {
 		this.firstName = fristName;
 		this.lastName = lastName;
 		this.email = email;
 		this.birthDate = birthDate;
 		this.joinDate = joinDate;
-		this.isActive = isActive;
+		this.isActive = 1;
+		this.loggedIn = 0;
+		
 	}
+	
 }

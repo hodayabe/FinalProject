@@ -1,4 +1,5 @@
 package ajbc.doodle.calendar.controllers;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -24,7 +25,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,11 +42,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ajbc.doodle.calendar.Application;
 import ajbc.doodle.calendar.ServerKeys;
+import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.Notification;
+import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.entities.webpush.PushMessage;
 import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;
+import ajbc.doodle.calendar.enums.Units;
 import ajbc.doodle.calendar.services.CryptoService;
+import ajbc.doodle.calendar.services.NotificationService;
+import ajbc.doodle.calendar.services.UserService;
 
 
 
@@ -68,8 +74,14 @@ public class PushController {
 	private final Algorithm jwtAlgorithm;
 
 	private final ObjectMapper objectMapper;
-	
+
 	private int counter;
+
+	@Autowired
+	UserService userService;
+	
+	@Autowired
+	NotificationService notificationService;
 
 	public PushController(ServerKeys serverKeys, CryptoService cryptoService, ObjectMapper objectMapper) {
 		this.serverKeys = serverKeys;
@@ -93,17 +105,42 @@ public class PushController {
 	@PostMapping("/subscribe/{email}")
 	@ResponseStatus(HttpStatus.CREATED)
 	public void subscribe(@RequestBody Subscription subscription, @PathVariable(required = false) String email) {
-		// TODO add to DB instead of a map
-		//if user is registered allow subscription
-		this.subscriptions.put(subscription.getEndpoint(), subscription);
-		System.out.println("Subscription added with email "+email);
+		
+		try {
+			//if user is registered allow subscription
+			User user = userService.getUserByEmail(email);
+			if(user == null)
+				System.out.println("User dont exist in DB");
+			else {
+				user.loggIn(true);
+				
+				System.out.println("1, public key: "+subscription.getKeys().getP256dh());
+				System.out.println("2, auth key: "+ subscription.getKeys().getAuth());
+				System.out.println("3, endPoint: "+subscription.getEndpoint());
+				
+//				SubscriptionData subData = new SubscriptionData(1, 2, 3);
+//				user.subData =subData;
+				userService.updateUser(user);
+				this.subscriptions.put(subscription.getEndpoint(), subscription);
+				System.out.println("Subscription added with email "+email);
+			}
+		} catch (DaoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	
+
 	@PostMapping("/unsubscribe/{email}")
-	public void unsubscribe(@RequestBody SubscriptionEndpoint subscription, @PathVariable(required = false) String email) {
+	public void unsubscribe(@RequestBody SubscriptionEndpoint subscription, @PathVariable(required = false) String email) throws DaoException {
 		this.subscriptions.remove(subscription.getEndpoint());
 		System.out.println("Subscription with email "+email+" got removed!");
+		User user = userService.getUserByEmail(email);
+		if(user == null)
+			System.out.println("User dont exist in DB");
+		else {
+			user.loggIn(false);
+		}
 	}
 
 
@@ -113,16 +150,17 @@ public class PushController {
 	}
 
 
-	
+
 //	@Scheduled(fixedDelay = 3_000)
-//	public void testNotification() {
+//	public void testNotification() throws DaoException {
 //		if (this.subscriptions.isEmpty()) {
 //			return;
 //		}
 //		counter++;
 //		try {
-//			
-//			Notification notification = new Notification(counter, LocalDateTime.now(), "Test notification", "Test message");
+////			Notification notification = new Notification(counter, LocalDateTime.now(), "Test notification", "Test message");
+//			Notification notification = notificationService.getAllNotifications().get(0);
+//
 //			sendPushMessageToAllSubscribers(this.subscriptions, new PushMessage("message: " + counter, notification.toString()));
 //			System.out.println(notification);
 //		} catch (JsonProcessingException e) {
@@ -133,16 +171,16 @@ public class PushController {
 //	}
 
 
-	private void sendPushMessageToAllSubscribersWithoutPayload() {
-		Set<String> failedSubscriptions = new HashSet<>();
-		for (Subscription subscription : this.subscriptions.values()) {
-			boolean remove = sendPushMessage(subscription, null);
-			if (remove) {
-				failedSubscriptions.add(subscription.getEndpoint());
-			}
-		}
-		failedSubscriptions.forEach(this.subscriptions::remove);
-	}
+//	private void sendPushMessageToAllSubscribersWithoutPayload() {
+//		Set<String> failedSubscriptions = new HashSet<>();
+//		for (Subscription subscription : this.subscriptions.values()) {
+//			boolean remove = sendPushMessage(subscription, null);
+//			if (remove) {
+//				failedSubscriptions.add(subscription.getEndpoint());
+//			}
+//		}
+//		failedSubscriptions.forEach(this.subscriptions::remove);
+//	}
 
 	private void sendPushMessageToAllSubscribers(Map<String, Subscription> subs, Object message)
 			throws JsonProcessingException {
@@ -192,7 +230,7 @@ public class PushController {
 		Builder httpRequestBuilder = HttpRequest.newBuilder();
 		if (body != null) {
 			httpRequestBuilder.POST(BodyPublishers.ofByteArray(body)).header("Content-Type", "application/octet-stream")
-					.header("Content-Encoding", "aes128gcm");
+			.header("Content-Encoding", "aes128gcm");
 		} else {
 			httpRequestBuilder.POST(BodyPublishers.ofString(""));
 			// httpRequestBuilder.header("Content-Length", "0");

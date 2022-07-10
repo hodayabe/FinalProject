@@ -2,48 +2,43 @@ package ajbc.doodle.calendar.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.daos.EventDao;
 import ajbc.doodle.calendar.daos.NotificationDao;
+import ajbc.doodle.calendar.daos.UserDao;
 import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.Notification;
+import ajbc.doodle.calendar.entities.User;
 
-
-@Service
+@Component()
 public class NotificationService {
 
 	@Autowired
-	@Qualifier("htNDao")
-	NotificationDao notificationDao;
+	private NotificationDao notificationDao;
+
 	@Autowired
-	@Qualifier("htEDao")
-	EventDao eventDao;
-	
-	public void addNotification(Notification notification) throws DaoException{
-		Event event = eventDao.getEvent(notification.getEventId());
-		// Check if event is exist in db.
-		if(event == null)
-			throw new DaoException("Event no exist in DB");
-		notification.setEvent(event);
+	private EventDao eventDao;
+
+	@Autowired
+	private UserDao userDao;
+
+	public void addNotification(int userId, int eventId, Notification notification) throws DaoException {
+		if (!userIsParticipant(eventId, userId))
+			throw new DaoException("This user is not participates in this event");
+		notification.setEvent(eventDao.getEvent(eventId));
+		notification.setUser(userDao.getUser(userId));
 		notificationDao.addNotification(notification);
 	}
-	
-	public void updateNotification(Notification notification) throws DaoException {
-		notificationDao.updateNotification(notification);
+
+	public List<Notification> getAllNotifications() throws DaoException {
+		return notificationDao.getAllNotifications();
 	}
 
-	public Notification getNotification(Integer notificationId) throws DaoException {
-		return notificationDao.getNotification(notificationId);
+	private boolean userIsParticipant(int eventId, int userId) throws DaoException {
+		Event event = eventDao.getEvent(eventId);
+		return event.getGuests().stream().map(User::getUserId).anyMatch(id -> id == userId);
 	}
-	
-//	public void deleteNotification(Integer eventId) throws DaoException {
-//		notificationDao.deleteEvent(eventId);
-//	}
-	
-	public List<Notification> getAllNotification() throws DaoException{
-		return notificationDao.getAllNotification();
-	}
+
 }

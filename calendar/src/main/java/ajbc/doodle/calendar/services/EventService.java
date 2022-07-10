@@ -1,12 +1,9 @@
 package ajbc.doodle.calendar.services;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.daos.EventDao;
@@ -14,35 +11,29 @@ import ajbc.doodle.calendar.daos.NotificationDao;
 import ajbc.doodle.calendar.daos.UserDao;
 import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.Notification;
+import ajbc.doodle.calendar.entities.User;
+import ajbc.doodle.calendar.enums.Units;
 
 
-@Service
+@Component
 public class EventService {
 
 	@Autowired
-	@Qualifier("htEDao")
 	EventDao eventDao;
+	
 	@Autowired
-	@Qualifier("htUDao")
 	UserDao userDao;
+	
 	@Autowired
-	@Qualifier("htNDao")
 	NotificationDao notificationDao;
 	
-	public void addEvent(Event event) throws DaoException{
-//		User user = userDao.getUser(event.getOwnerId());
-//		// Check if user owner is exist in db.
-//		if(user == null)
-//			throw new DaoException("User no exist in DB");
-		Set<Notification> notifications = event.getNotifications();
-		
-		if(!notifications.isEmpty()) {
-			List<Notification> listNot = new ArrayList<Notification>(notifications);
-			for (int i = 0; i < listNot.size(); i++) {
-				notificationDao.addNotification(listNot.get(i));
-			}
-		}	
+	
+	public void addEvent(Event event , Integer id) throws DaoException{
+		User user = userDao.getUser(id);
+		event.setOwner(user);
 		eventDao.addEvent(event);
+		
+		notificationDao.addNotification(new Notification(event, user,event.getTitle(),event.getTitle(), Units.HOURS, 0));
 	}
 	
 	public void updateEvent(Event event) throws DaoException {
@@ -58,6 +49,6 @@ public class EventService {
 	}
 	
 	public List<Event> getAllEvent() throws DaoException{
-		return eventDao.getAllEvent();
+		return eventDao.getAllEvents();
 	}
 }

@@ -16,10 +16,8 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import ajbc.doodle.calendar.enums.Units;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,10 +25,8 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @ToString
-
 
 @Entity
 @Table(name = "Notifications")
@@ -39,22 +35,51 @@ public class Notification {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer notId;
-	private Integer userId;
-	private LocalDateTime localDateTime;
-	private String title;
-	@Column(name = "nMessage")
-	private String message;
-	@Enumerated(EnumType.STRING)
-	private Units unit;
-	private int quantity;
 	
-	@JsonIgnore
 	@Column(insertable=false, updatable=false)
 	private Integer eventId;
 	
+	@JsonIgnore
 	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name="eventId")
-	@JsonIgnore
 	private Event event;
+	
+	@JsonIgnore
+	@Column(insertable=false, updatable=false)
+	private Integer userId;
+	
+	
+	@JsonIgnore
+	@ManyToOne(cascade = {CascadeType.MERGE})
+	@JoinColumn(name="userId")
+	@JsonBackReference
+	private User user;
+	
+	private LocalDateTime startDateTime;
+	
+	private String title;
+	
+	@Column(name = "nMessage")
+	private String message;
+		
+	@Enumerated(EnumType.STRING)
+	private Units units;
+	
+	private int quantity;
+	
+	
+	public Notification(Event event, User user, String title,String message, Units units, Integer qiantity) {
+		this.event = event;
+		this.user = user;
+		this.title = title;
+		this.message = message;
+		this.units = units;
+		this.quantity = qiantity;
+		if (units.equals(Units.HOURS))
+			this.startDateTime = event.getStartDateTime().minusHours(quantity);
+		else
+			this.startDateTime = event.getStartDateTime().minusMinutes(quantity);
+		
+	}
 
 }

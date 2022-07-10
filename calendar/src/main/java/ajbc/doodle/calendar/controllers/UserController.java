@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.ErrorMessage;
 import ajbc.doodle.calendar.entities.User;
+import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.services.UserService;
 
 @RequestMapping("/users")
@@ -24,7 +26,7 @@ import ajbc.doodle.calendar.services.UserService;
 public class UserController {
 
 	
-	@Autowired
+@Autowired
 	
 	UserService service;
 	
@@ -88,6 +90,19 @@ public class UserController {
 	}
 	
 	
+	@RequestMapping(method = RequestMethod.PUT, path = "/{id}")
+	public ResponseEntity<?> updateUser(@RequestBody User user, @PathVariable Integer id) {
+		try {
+			user.setUserId(id);
+			service.updateUser(user);
+			user = service.getUser(id);
+			return ResponseEntity.status(HttpStatus.OK).body(user);
+		} catch (DaoException e) {
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(e.getMessage());
+		}
+	}
+	
+	
 	@RequestMapping(method = RequestMethod.DELETE, path="/{id}")
 	public ResponseEntity<User>  DeleteUser(@PathVariable Integer id ,@RequestParam Map<String, String> map ) throws DaoException {
 		Set<String> keys = map.keySet();
@@ -105,8 +120,6 @@ public class UserController {
 			
 		return ResponseEntity.ok(user);
 	}
-	
-	
 	
 	
 	

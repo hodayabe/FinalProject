@@ -31,12 +31,13 @@ public interface EventDao {
 	}
 
 	//Queries
-	
-	// QUERIES
-		public default List<Event> getAllEvent() throws DaoException {
+			public default List<Event> getAllEvents() throws DaoException {
 			throw new DaoException("Method not implemented");
 		}
 
+		public default List<Event> getEventsByUser(Integer userId) throws DaoException {
+			throw new DaoException("Method not implemented");
+		}
 
 	
 	

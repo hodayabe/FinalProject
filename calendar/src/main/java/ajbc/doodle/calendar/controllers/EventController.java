@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ajbc.doodle.calendar.daos.DaoException;
@@ -22,22 +23,22 @@ public class EventController {
 	@Autowired
 	EventService service;
 	
-//	@RequestMapping(method = RequestMethod.POST)
-//	public ResponseEntity<?> addEvent(@RequestBody Event event) {
-//		
-//		try {
-//			service.addEvent(event);
-//			event = service.getEventById(event.getEventId());
-//			return ResponseEntity.status(HttpStatus.CREATED).body(event);
-//		} catch (DaoException e) {
-//			ErrorMessage errorMessage = new ErrorMessage();
-//			errorMessage.setData(e.getMessage());
-//			errorMessage.setMessage("failed to add event to db");
-//			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errorMessage);
-//		}
-//	}
-//	
-//
+	@RequestMapping(method = RequestMethod.POST, path = "/{id}")
+	public ResponseEntity<?> addEvent(@RequestBody Event event ,@PathVariable Integer id ) {
+		
+		try {
+			service.addEvent(event,id);
+			event = service.getEvent(event.getEventId());
+			return ResponseEntity.status(HttpStatus.CREATED).body(event);
+		} catch (DaoException e) {
+			ErrorMessage errorMessage = new ErrorMessage();
+			errorMessage.setData(e.getMessage());
+			errorMessage.setMessage("failed to add event to db");
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errorMessage);
+		}
+	}
+	
+
 	@RequestMapping(method = RequestMethod.GET, path = "/{id}")
 	public ResponseEntity<?> getEventById(@PathVariable Integer id) {
 
@@ -64,7 +65,18 @@ public class EventController {
 		return ResponseEntity.ok(list);
 	}
 	
+	@RequestMapping(method = RequestMethod.PUT, path = "/{eventId}")
+	public ResponseEntity<?> updateEvent(@RequestBody Event event,@PathVariable Integer eventId) {
+		try {
+			event.setEventId(eventId);
+			service.updateEvent(event);
+			event = service.getEvent(eventId);
+			return ResponseEntity.status(HttpStatus.OK).body(event);
+		} catch (DaoException e) {
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(e.getMessage());
+		}
+	}
 	
-
+	
 
 }

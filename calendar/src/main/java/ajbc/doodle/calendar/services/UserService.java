@@ -1,6 +1,7 @@
 package ajbc.doodle.calendar.services;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -46,9 +47,9 @@ public class UserService {
 
 	public List<User> getUsersByEvent(Integer eventId) throws DaoException {
 		Event event = eventDao.getEvent(eventId);
-		List<User> usres = event.getGuests();
-		usres.add(userDao.getUser(event.getOwnerId()));
-		return usres;
+		Set<User> usres = event.getGuests();
+//		usres.add(userDao.getUser(event.getOwnerId()));
+		return (List<User>) usres;
 
 	}
 

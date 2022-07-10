@@ -1,7 +1,9 @@
 package ajbc.doodle.calendar.daos;
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.stereotype.Repository;
@@ -38,21 +40,27 @@ public class HTEventDao implements EventDao {
 	@Override
 	public void deleteEvent(Integer eventId) throws DaoException {
 		Event ev = getEvent(eventId);
-		ev.setDiscontinued(1);
+		ev.setIsActive(0);
 		updateEvent(ev);
 	}
 
 	
 	
 		@Override
-		public List<Event> getAllEvent() throws DaoException {
+		public List<Event> getAllEvents() throws DaoException {
 			DetachedCriteria criteria = DetachedCriteria.forClass(Event.class);
-			List<Event> eventList = (List<Event>)template.findByCriteria(criteria);
-			if(eventList==null)
-				throw new DaoException("No event found in DB");
-			return eventList;
+			return (List<Event>) template.findByCriteria(criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY));
 		}
 		
+		
+		@Override
+		public List<Event> getEventsByUser(Integer userId) throws DaoException {
+			DetachedCriteria criteria = DetachedCriteria.forClass(Event.class);
+			criteria.createAlias("users", "user");
+			criteria.add(Restrictions.eq("user.id", userId));
+			
+			return (List<Event>)template.findByCriteria(criteria);
+		}
 		
 		
 
