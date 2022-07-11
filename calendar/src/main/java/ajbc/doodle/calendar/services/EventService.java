@@ -36,6 +36,7 @@ public class EventService {
 		notificationDao.addNotification(new Notification(event, user,event.getTitle(),event.getTitle(), Units.HOURS, 0));
 	}
 	
+	
 	public void updateEvent(Event event) throws DaoException {
 		eventDao.updateEvent(event);
 	}

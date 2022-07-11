@@ -26,7 +26,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString
+//@ToString
 
 @Entity
 @Table(name = "Notifications")
@@ -44,7 +44,7 @@ public class Notification {
 	@JoinColumn(name="eventId")
 	private Event event;
 	
-	@JsonIgnore
+//	@JsonIgnore
 	@Column(insertable=false, updatable=false)
 	private Integer userId;
 	
@@ -52,7 +52,7 @@ public class Notification {
 	@JsonIgnore
 	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name="userId")
-	@JsonBackReference
+//	@JsonBackReference
 	private User user;
 	
 	private LocalDateTime startDateTime;
@@ -69,7 +69,9 @@ public class Notification {
 	
 	
 	public Notification(Event event, User user, String title,String message, Units units, Integer qiantity) {
+		this.eventId=event.getEventId();
 		this.event = event;
+		this.userId=user.getUserId();
 		this.user = user;
 		this.title = title;
 		this.message = message;
@@ -81,5 +83,15 @@ public class Notification {
 			this.startDateTime = event.getStartDateTime().minusMinutes(quantity);
 		
 	}
+
+
+	@Override
+	public String toString() {
+		return "Notification [notId=" + notId + ", eventId=" + eventId + ", userId=" + userId + ", startDateTime="
+				+ startDateTime + ", title=" + title + ", message=" + message + ", units=" + units + ", quantity="
+				+ quantity + "]";
+	}
+	
+	
 
 }

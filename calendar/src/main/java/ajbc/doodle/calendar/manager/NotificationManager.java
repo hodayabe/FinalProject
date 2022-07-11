@@ -11,7 +11,7 @@ import ajbc.doodle.calendar.entities.Notification;
 public class NotificationManager {
 	
 	
-	private Queue<Notification> notificationsQueue = new PriorityQueue<Notification>(new Comparator<Notification>() {
+	public static Queue<Notification> notificationsQueue = new PriorityQueue<Notification>(new Comparator<Notification>() {
 		@Override
 		public int compare(Notification n1, Notification n2) {
 			
@@ -22,8 +22,7 @@ public class NotificationManager {
 				return -1;
 			
 			return 1;
-		}
-	});
+		}});
 	
 	
 //	ScheduledExecutorService executorService = Executors.newScheduledThreadPool(NUM_THREADS);

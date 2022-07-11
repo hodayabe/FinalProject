@@ -54,10 +54,11 @@ public class User {
 	private Integer isActive;
 	private Integer loggedIn;
 	
-
-//	private  String endpoint;
-//	private  String p256dh;
-//	private  String auth;
+	
+	@Column(name = "uEndpoint")
+	private  String endpoint;
+	private  String p256dh;
+	private  String auth;
 	
 //	@JsonProperty(access = Access.AUTO)
 //	@Fetch(FetchMode.JOIN)

@@ -9,6 +9,7 @@ import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.stereotype.Component;
 
 import ajbc.doodle.calendar.entities.Notification;
+import ajbc.doodle.calendar.manager.NotificationManager;
 
 @SuppressWarnings("unchecked")
 @Component(value = "htNDao")
@@ -22,6 +23,7 @@ public class HTNotificationDao implements NotificationDao {
 	@Override
 	public void addNotification(Notification notification) throws DaoException {
 		template.persist(notification);
+		NotificationManager.notificationsQueue.add(notification);
 	}
 
 	// Queries
