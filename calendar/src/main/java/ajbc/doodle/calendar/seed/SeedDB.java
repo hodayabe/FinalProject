@@ -20,6 +20,9 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 @Component
@@ -37,6 +40,12 @@ public class SeedDB {
 
 	@EventListener
 	public void seed(ContextRefreshedEvent event) throws DaoException{
+//		ScheduledExecutorService executorService = Executors.newScheduledThreadPool(4);
+//		
+//		for (int i = 2; i <6; i*=2) {
+//			executorService.schedule(() -> System.out.println(4+"*****"), i, TimeUnit.SECONDS);
+//		}
+		
 			seedUsersTable();
 			seedEventTable();
 			seedNotificationTable();
@@ -81,7 +90,7 @@ public class SeedDB {
 					LocalDateTime.of(2022,10, 12, 23, 0), "label", "Wedding", RepeatingOptions.NONE, 1, guests2),owner2.getUserId());
 		}
 		
-		eventService.addEvent(new Event(owner2, "lobaa", 0, LocalDateTime.of(2022, 10, 12, 20, 30),
+		eventService.addEvent(new Event(owner2, "lobaa", 0, LocalDateTime.of(2022, 07, 15, 15, 44),
 				LocalDateTime.of(2022,10, 12, 23, 0), "ego", "ego", RepeatingOptions.NONE, 1, guests2),owner2.getUserId());
 	}
 	
@@ -94,12 +103,12 @@ public class SeedDB {
 		Event event1 = eventService.getEvent(1000);
 		Event event2 = eventService.getEvent(1001);
 
-//		List<Notification> notifications = notificationDao.getAllNotifications();
-//		if (notifications == null || notifications.size() == 0) {
+		List<Notification> notifications = notificationDao.getAllNotifications();
+		if (notifications == null || notifications.size() == 0) {
 			notificationDao.addNotification(new Notification(event1, user1,event1.getTitle(), "Study", Units.HOURS, 10));
 			notificationDao.addNotification(new Notification(event1, user1,event1.getTitle(), "Study", Units.HOURS, 5));
 			notificationDao.addNotification(new Notification(event2, user1,event2.getTitle(), "Buy gift", Units.HOURS, 10));
-//		}
+		}
 	}
 	
 	

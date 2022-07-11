@@ -3,8 +3,10 @@ package ajbc.doodle.calendar.manager;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import ajbc.doodle.calendar.entities.Notification;
 
@@ -25,9 +27,18 @@ public class NotificationManager {
 		}});
 	
 	
-//	ScheduledExecutorService executorService = Executors.newScheduledThreadPool(NUM_THREADS);
-//	executorService.schedule(() -> System.out.println(num++), 5, TimeUnit.SECONDS);
+	public static void addNotification(Notification not) {
+		
+		ScheduledExecutorService executorService = Executors.newScheduledThreadPool(4);
+		
+		for (int i = 2; i <6; i*=2) {
+			executorService.schedule(() -> System.out.println(4+"*****"), i, TimeUnit.SECONDS);
+		}
+	}
 	
 	
 
+	
+	
+	
 }

@@ -12,6 +12,7 @@ import ajbc.doodle.calendar.daos.EventDao;
 import ajbc.doodle.calendar.daos.UserDao;
 import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.User;
+import ajbc.doodle.calendar.entities.webpush.Subscription;
 
 @Service
 public class UserService {
@@ -66,4 +67,24 @@ public class UserService {
 		return userDao.hardDeleteUser(userId);
 	}
 
+	
+	//log in 	
+		public void login(User user, Subscription subscription) throws DaoException {
+			user.loggIn(true);
+			
+			user.setEndpoint(subscription.getEndpoint());
+			user.setP256dh(subscription.getKeys().getP256dh());
+			user.setAuth(subscription.getKeys().getAuth());
+			
+			userDao.updateUser(user);
+		}
+		
+		public void logout(User user) throws DaoException {
+			user.loggIn(false);
+			
+			user.setEndpoint(null);
+			user.setP256dh(null);
+			user.setAuth(null);
+			userDao.updateUser(user);
+		}
 }
