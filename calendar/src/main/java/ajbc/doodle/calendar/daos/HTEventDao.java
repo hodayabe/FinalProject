@@ -1,7 +1,6 @@
 package ajbc.doodle.calendar.daos;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -45,10 +44,18 @@ public class HTEventDao implements EventDao {
 	}
 
 	@Override
-	public void deleteEvent(Integer eventId) throws DaoException {
+	public Event softDeleteEvent(Integer eventId) throws DaoException {
 		Event ev = getEvent(eventId);
 		ev.setIsActive(0);
 		updateEvent(ev);
+		return getEvent(eventId);
+	}
+
+	@Override
+	public Event hardDeleteEvent(Integer eventId) throws DaoException {
+		Event ev = getEvent(eventId);
+		 template.delete(ev);
+		 return ev;
 	}
 
 	@Override
@@ -83,14 +90,10 @@ public class HTEventDao implements EventDao {
 	}
 
 	@Override
-	public List<Event> getEventOfUserInRange(Integer userId, String start, String end) throws DaoException {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-		LocalDateTime startDateTime = LocalDateTime.parse(start, formatter);
-		LocalDateTime endDateTime = LocalDateTime.parse(end, formatter);
-
+	public List<Event> getEventOfUserInRange(Integer userId, LocalDateTime start, LocalDateTime end) throws DaoException {
 		DetachedCriteria criteria = DetachedCriteria.forClass(Event.class);
-		Criterion criterion = Restrictions.between("startDateTime", startDateTime, endDateTime);
-		Criterion criterion1 = Restrictions.between("endDateTime", startDateTime, endDateTime);
+		Criterion criterion = Restrictions.between("startDateTime", start, end);
+		Criterion criterion1 = Restrictions.between("endDateTime", start, end);
 
 		criteria.add(criterion);
 		criteria.add(criterion1);

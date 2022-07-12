@@ -102,7 +102,7 @@ public class HTUserDao implements UserDao {
 	@Override
 	public User softDeleteUser(Integer userId) throws DaoException {
 		User us = getUser(userId);
-		us.setIsActive(1);;
+		us.setIsActive(0);
 		updateUser(us);
 		return getUser(userId);
 	}

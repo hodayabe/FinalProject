@@ -1,6 +1,7 @@
 package ajbc.doodle.calendar.controllers;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,22 +88,29 @@ public class EventController {
 			return ResponseEntity.ok(eventList);
 		}
 
-		// Get events of a user in a range between start date and time to end date andtime
-		if (keys.contains("userId") && keys.contains("start") && keys.contains("end")) {
-			List<Event> usersList = eventService.getEventOfUserInRange(Integer.parseInt(map.get("userId")),
-					map.get("start"), map.get("end"));
+		
+		if (keys.contains("start") && keys.contains("end")) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+			LocalDateTime startDateTime = LocalDateTime.parse(map.get("start"), formatter);
+			LocalDateTime endDateTime = LocalDateTime.parse( map.get("end"), formatter);
+			
+			// Get all events in a range between start date and time to end date and time.
+			if(!keys.contains("userId")) {
+				List<Event> usersList = eventService.getEventsInRange(startDateTime, endDateTime);
+				return ResponseEntity.ok(usersList);
+			}
+			
+			// Get events of a user in a range between start date and time to end date andtime
+			List<Event> usersList = eventService.getEventOfUserInRange(Integer.parseInt(map.get("userId")),startDateTime,endDateTime);
 			return ResponseEntity.ok(usersList);
 		}
 
-		// Get all events in a range between start date and time to end date and time.
-		if (!keys.contains("userId") && keys.contains("start") && keys.contains("end")) {
-			List<Event> usersList = eventService.getEventsInRange(map.get("start"), map.get("end"));
-			return ResponseEntity.ok(usersList);
-		}
 
 		//Get events of a user the next coming num of minutes and hours.
-				if (keys.contains("userId") && keys.contains("minutes ") && keys.contains("hours")) {
-					List<Event> usersList = eventService.nextComingNumOfMinutesAndHours(Integer.parseInt(map.get("userId")),Integer.parseInt(map.get("minutes")), map.get("end"));
+				if (keys.contains("userId") && keys.contains("minutes") && keys.contains("hours")) {
+					LocalDateTime dateTime =LocalDateTime.now().plusHours(Integer.parseInt(map.get("hours"))).plusMinutes(Integer.parseInt(map.get("minutes")));
+					
+					List<Event> usersList = eventService.getEventOfUserInRange(Integer.parseInt(map.get("userId")),LocalDateTime.now(),dateTime);
 					return ResponseEntity.ok(usersList);
 				}
 		
@@ -128,4 +136,27 @@ public class EventController {
 		return ResponseEntity.ok(list);
 	}
 
+	
+	@RequestMapping(method = RequestMethod.DELETE, path = "/{id}")
+	public ResponseEntity<Event> DeleteEvent(@PathVariable Integer id, @RequestParam Map<String, String> map)
+			throws DaoException {
+		Set<String> keys = map.keySet();
+		Event event = null;
+
+		if (keys.contains("soft"))
+			event = eventService.softDeleteEvent(id);
+
+		if (keys.contains("hard"))
+			event = eventService.hardDeleteEvent(id);
+
+		if (event == null)
+			return ResponseEntity.notFound().build();
+
+		return ResponseEntity.ok(event);
+	}
+
+	
+	
+	
+	
 }

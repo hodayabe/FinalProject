@@ -51,12 +51,16 @@ public class EventService {
 		eventDao.updateEvent(event);
 	}
 
-	public Event getEvent(Integer userId) throws DaoException {
-		return eventDao.getEvent(userId);
+	public Event getEvent(Integer eventId) throws DaoException {
+		return eventDao.getEvent(eventId);
 	}
 	
-	public void deleteEvent(Integer eventId) throws DaoException {
-		eventDao.deleteEvent(eventId);
+	public Event softDeleteEvent(Integer eventId) throws DaoException {
+		return eventDao.softDeleteEvent(eventId);
+	}
+
+	public Event hardDeleteEvent(Integer eventId) throws DaoException {
+		return eventDao.hardDeleteEvent(eventId);
 	}
 	
 	public List<Event> getAllEvent() throws DaoException{
@@ -67,13 +71,16 @@ public class EventService {
 		return eventDao.getUpcomingEvents(userId, date);
 	}
 	
-	public List<Event>getEventOfUserInRange(Integer userId,String start, String end) throws DaoException {
+	public List<Event>getEventOfUserInRange(Integer userId,LocalDateTime start, LocalDateTime end) throws DaoException {
 		return eventDao.getEventOfUserInRange(userId, start,end);
 	}
 	
 	
-	public List<Event>getEventsInRange(String start, String end) throws DaoException {
+	public List<Event>getEventsInRange(LocalDateTime start, LocalDateTime end) throws DaoException {
 		return eventDao.getEventOfUserInRange(0, start,end);
 	}
+	
+//	nextComingNumOfMinutesAndHours(Integer.parseInt(map.get("userId")),Integer.parseInt(map.get("minutes")), map.get("end"));
+	
 	
 }
