@@ -1,6 +1,7 @@
 package ajbc.doodle.calendar.daos;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +44,7 @@ public interface UserDao {
 		throw new DaoException("Method not implemented");
 	}
 	
-	public default List<User> getUsersWithEventInRange(String start, String end) throws DaoException {
+	public default Set<User> getUsersWithEventInRange(String start, String end) throws DaoException {
 		
 		throw new DaoException("Method not implemented");
 	}

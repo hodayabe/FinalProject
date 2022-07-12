@@ -1,10 +1,12 @@
 package ajbc.doodle.calendar.daos;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
 import ajbc.doodle.calendar.entities.Event;
+import ajbc.doodle.calendar.entities.User;
 
 
 
@@ -39,6 +41,12 @@ public interface EventDao {
 			throw new DaoException("Method not implemented");
 		}
 
-	
+		public default List<Event> getUpcomingEvents(Integer userId, LocalDateTime date) throws DaoException {
+			throw new DaoException("Method not implemented");
+		}
+		
+		public default List<Event> getEventOfUserInRange(Integer userId,String start, String end) throws DaoException {
+			throw new DaoException("Method not implemented");
+		}
 	
 }

@@ -2,7 +2,6 @@ package ajbc.doodle.calendar.daos;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -77,7 +76,7 @@ public class HTUserDao implements UserDao {
 	
 	
 	@Override
-	public List<User> getUsersWithEventInRange(String start, String end) throws DaoException {
+	public Set<User> getUsersWithEventInRange(String start, String end) throws DaoException {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); 
 		LocalDateTime startDateTime = LocalDateTime.parse(start, formatter);
 		LocalDateTime endDateTime = LocalDateTime.parse(end, formatter);
@@ -97,7 +96,7 @@ public class HTUserDao implements UserDao {
 			users.addAll(e.getGuests());
 		});
 
-		return new ArrayList<User>(users);
+		return users;
 	}
 	
 	@Override

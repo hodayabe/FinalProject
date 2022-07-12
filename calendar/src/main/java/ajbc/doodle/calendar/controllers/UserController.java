@@ -29,22 +29,12 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.HashSet;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-
-import org.springframework.web.bind.annotation.GetMapping;
-
-
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import ajbc.doodle.calendar.Application;
-
-import ajbc.doodle.calendar.services.CryptoService;
 
 @RequestMapping("/users")
 @RestController
@@ -88,7 +78,8 @@ public class UserController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity<?> getUsers(@RequestParam Map<String, String> map) throws DaoException {
-		List<User> list;
+		List<User> userList=null;
+		Set <User> userSet=null;
 		Set<String> keys = map.keySet();
 		User user;
 
@@ -100,18 +91,23 @@ public class UserController {
 		}
 
 		else if (keys.contains("start") && keys.contains("end"))
-			list = service.getUsersWithEventInRange(map.get("start"), map.get("end"));
+			userSet = service.getUsersWithEventInRange(map.get("start"), map.get("end"));
 
-		else if (keys.contains("eventId"))
-			list = service.getUsersByEvent(Integer.parseInt(map.get("eventId")));
-
+		else if (keys.contains("eventId")) 
+			userSet =service.getUsersByEvent(Integer.parseInt(map.get("eventId")));		
+		
 		else
-			list = service.getAllUsers();
+			userList = service.getAllUsers();
+		
+		
 
-		if (list == null)
+		if (userList == null && userSet == null )
 			return ResponseEntity.notFound().build();
 
-		return ResponseEntity.ok(list);
+		if(userSet !=null)
+			return ResponseEntity.ok(userSet);
+		
+		return ResponseEntity.ok(userList);
 	}
 
 	@RequestMapping(method = RequestMethod.PUT, path = "/{id}")

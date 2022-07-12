@@ -18,11 +18,6 @@ import org.hibernate.annotations.FetchMode;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-//import org.hibernate.FetchMode;
-//import org.hibernate.annotations.Fetch;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -60,8 +55,8 @@ public class User {
 	private  String p256dh;
 	private  String auth;
 	
-//	@JsonProperty(access = Access.AUTO)
-//	@Fetch(FetchMode.JOIN)
+//	@JsonProperty(access = Access.READ_ONLY)
+	@Fetch(FetchMode.JOIN)
 	@ManyToMany(mappedBy="guests",cascade = {CascadeType.MERGE,CascadeType.REFRESH})
 	@JsonIgnore
 	private Set<Event> events = new HashSet<Event>();
@@ -75,6 +70,7 @@ public class User {
 		else
 			setLoggedIn(0);
 	}
+	
 	
 	public User(String fristName, String lastName, String email, LocalDate birthDate, LocalDate joinDate) {
 		this.firstName = fristName;

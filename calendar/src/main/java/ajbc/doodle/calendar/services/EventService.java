@@ -1,6 +1,8 @@
 package ajbc.doodle.calendar.services;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,7 +33,15 @@ public class EventService {
 	public void addEvent(Event event , Integer id) throws DaoException{
 		User user = userDao.getUser(id);
 		event.setOwner(user);
+		Set <User> usersListList = event.getGuests();
+		usersListList.add(user);
+		event.setGuests(usersListList);
 		eventDao.addEvent(event);
+		
+		Set <Event> eventsList = user.getEvents();
+		eventsList.add(event);
+		user.setEvents(eventsList);
+		userDao.updateUser(user);
 		
 		notificationDao.addNotification(new Notification(event, user,event.getTitle(),event.getTitle(), Units.HOURS, 0));
 	}
@@ -52,4 +62,18 @@ public class EventService {
 	public List<Event> getAllEvent() throws DaoException{
 		return eventDao.getAllEvents();
 	}
+	
+	public List<Event> getUpcomingEvents(Integer userId, LocalDateTime date) throws DaoException {
+		return eventDao.getUpcomingEvents(userId, date);
+	}
+	
+	public List<Event>getEventOfUserInRange(Integer userId,String start, String end) throws DaoException {
+		return eventDao.getEventOfUserInRange(userId, start,end);
+	}
+	
+	
+	public List<Event>getEventsInRange(String start, String end) throws DaoException {
+		return eventDao.getEventOfUserInRange(0, start,end);
+	}
+	
 }

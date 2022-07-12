@@ -40,11 +40,6 @@ public class SeedDB {
 
 	@EventListener
 	public void seed(ContextRefreshedEvent event) throws DaoException{
-//		ScheduledExecutorService executorService = Executors.newScheduledThreadPool(4);
-//		
-//		for (int i = 2; i <6; i*=2) {
-//			executorService.schedule(() -> System.out.println(4+"*****"), i, TimeUnit.SECONDS);
-//		}
 		
 			seedUsersTable();
 			seedEventTable();
@@ -90,8 +85,8 @@ public class SeedDB {
 					LocalDateTime.of(2022,10, 12, 23, 0), "label", "Wedding", RepeatingOptions.NONE, 1, guests2),owner2.getUserId());
 		}
 		
-		eventService.addEvent(new Event(owner2, "lobaa", 0, LocalDateTime.of(2022, 07, 15, 15, 44),
-				LocalDateTime.of(2022,10, 12, 23, 0), "ego", "ego", RepeatingOptions.NONE, 1, guests2),owner2.getUserId());
+//		eventService.addEvent(new Event(owner2, "lobaa", 0, LocalDateTime.of(2022, 07, 12, 9, 30),
+//				LocalDateTime.of(2022,07, 12, 23, 0), "ego", "ego", RepeatingOptions.NONE, 1, guests2),owner2.getUserId());
 	}
 	
 	

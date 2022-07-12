@@ -38,7 +38,7 @@ public class UserService {
 		return userDao.getAllUsers();
 	}
 
-	public List<User> getUsersWithEventInRange(String start, String end ) throws DaoException {
+	public Set<User> getUsersWithEventInRange(String start, String end ) throws DaoException {
 		return userDao.getUsersWithEventInRange(start,end);
 	}
 	
@@ -46,12 +46,13 @@ public class UserService {
 		userDao.updateUser(user);
 	}
 
-	public List<User> getUsersByEvent(Integer eventId) throws DaoException {
+	public Set<User> getUsersByEvent(Integer eventId) throws DaoException {
 		Event event = eventDao.getEvent(eventId);
+		if(event == null)
+			return null;
 		Set<User> usres = event.getGuests();
-//		usres.add(userDao.getUser(event.getOwnerId()));
-		return (List<User>) usres;
-
+			usres.add(userDao.getUser(event.getOwnerId()));
+		return usres;
 	}
 
 	public User getUserByEmail(String email) throws DaoException {
