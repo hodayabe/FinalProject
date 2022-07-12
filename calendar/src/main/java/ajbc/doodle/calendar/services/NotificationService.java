@@ -1,5 +1,7 @@
 package ajbc.doodle.calendar.services;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,7 +26,7 @@ public class NotificationService {
 	@Autowired
 	private UserDao userDao;
 
-	public void addNotification(int userId, int eventId, Notification notification) throws DaoException {
+	public void addNotification(Integer userId, Integer eventId, Notification notification) throws DaoException {
 		if (!userIsParticipant(eventId, userId))
 			throw new DaoException("This user is not participates in this event");
 		notification.setEvent(eventDao.getEvent(eventId));
@@ -32,13 +34,39 @@ public class NotificationService {
 		notificationDao.addNotification(notification);
 	}
 
+	public Notification getNotificationById(Integer notId) throws DaoException {
+		return notificationDao.getNotification(notId);
+	}
+	
+	
 	public List<Notification> getAllNotifications() throws DaoException {
 		return notificationDao.getAllNotifications();
 	}
 
+	public void updateNotification(Notification not) throws DaoException {
+		notificationDao.updateNotification(not);
+	}
+	
+	
+	//TODO
 	private boolean userIsParticipant(int eventId, int userId) throws DaoException {
 		Event event = eventDao.getEvent(eventId);
 		return event.getGuests().stream().map(User::getUserId).anyMatch(id -> id == userId);
 	}
+	
+	
+	public List<Notification> getNotificationsByEvent(Integer eventId) throws DaoException {
+		Event event = eventDao.getEvent(eventId);
+		if(event == null)
+			return null;
+		Set<Notification> nots = event.getNotifications();
+		
+		
+		return new ArrayList<Notification>(nots) ;
+	}
+	
+	
+	
+	
 
 }
