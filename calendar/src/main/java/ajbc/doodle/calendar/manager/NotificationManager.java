@@ -2,6 +2,7 @@ package ajbc.doodle.calendar.manager;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -12,78 +13,127 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ExecutorService;
 
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.services.MessagePushService;
+import ajbc.doodle.calendar.services.NotificationService;
 import ajbc.doodle.calendar.services.UserService;
 
-@Service
+@Component
 public class NotificationManager {
-	
+
 	@Autowired
 	UserService userService;
 	@Autowired
+	NotificationService notificationService;
+	@Autowired
 	MessagePushService messagePushService;
-	
-	private static final int NUM_THREAD_M = 1;
-	private long nextTime = 5;
-	
-	ScheduledExecutorService executorManager = Executors.newScheduledThreadPool(NUM_THREAD_M);
-	public static Queue<Notification> notificationsQueue = new PriorityQueue<Notification>(new Comparator<Notification>() {
+
+	private final int NUM_THREAD_M = 1;
+	private LocalDateTime dateTime = null;
+	private ScheduledExecutorService executorManager = Executors.newScheduledThreadPool(NUM_THREAD_M);
+	private Queue<Notification> notificationsQueue = new PriorityQueue<Notification>(new Comparator<Notification>() {
+
 		@Override
 		public int compare(Notification n1, Notification n2) {
-			
+
 			if(n1.getStartDateTime().equals(n2.getStartDateTime()))
 				return 0;
-			
+
 			else if(n1.getStartDateTime().isAfter(n2.getStartDateTime()))
-				return -1;
-			
-			return 1;
+				return 1;
+
+			return -1;
 		}});
+
 	
-	public void addQueue(Notification notification) throws DaoException {
-		if(notificationsQueue.isEmpty()) {
-			nextTime = Duration.between(LocalDateTime.now(), notification.getStartDateTime()).getSeconds();
-			System.out.println("nextTime: "+nextTime);
-			executorManager.schedule(managerQueue, nextTime, TimeUnit.SECONDS);
+	@EventListener
+	public void start(ContextRefreshedEvent event) {
+		try {
+			
+			List<Notification> nots = notificationService.getUntreatedNotifications();
+			notificationsQueue.addAll(nots);
+			
+			if(!notificationsQueue.isEmpty()) {
+				createThread(notificationsQueue.peek().getStartDateTime());
+			}
+		} catch (DaoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		notificationsQueue.add(notification);
-		System.out.println("hiii");
-//		userService.getUser(notification.getUserId());
 	}
 	
+
 	
-	public Runnable managerQueue = () -> {
+	
+	private void createThread(LocalDateTime dateTime) {
+
+		this.dateTime = dateTime;
+
+		long secondsToSleep = timeToSleep(dateTime);
+
+		if (executorManager != null) {
+			executorManager.shutdownNow();
+		}
+
+		executorManager = Executors.newScheduledThreadPool(NUM_THREAD_M);
+		executorManager.schedule(queueManager, secondsToSleep, TimeUnit.SECONDS);
+	}
+	
+
+	private long timeToSleep(LocalDateTime dateTime) {
+		long secondsToSleep = LocalDateTime.now().until(dateTime, ChronoUnit.SECONDS);
+		return secondsToSleep < 0 ? 0 : secondsToSleep;
+//		long sleep = Duration.between(LocalDateTime.now(),dateTime).getSeconds();
+//		return sleep < 0 ? 0 : sleep;
+		
+		
+	}
+	
+	public void addQueue(Notification notification) {
+		notificationsQueue.add(notification);
+		if (dateTime == null || notification.getStartDateTime().isBefore(dateTime)) {
+			createThread(notification.getStartDateTime());
+		}
+	}
+
+
+
+	public Runnable queueManager = () -> {
 		List<Notification> list = new ArrayList<Notification>();
-		ExecutorService executorSlaves = Executors.newCachedThreadPool();
-		LocalDateTime dateTime = null;
-		boolean firstTime = true;
+		ExecutorService executor = Executors.newCachedThreadPool();
 		while(!notificationsQueue.isEmpty()) {
-			if(firstTime) { 
+
+			if(notificationsQueue.peek().getStartDateTime().equals(dateTime) || notificationsQueue.peek().getStartDateTime().isBefore(dateTime)) { 
 				list.add(notificationsQueue.poll());
-				dateTime = list.get(0).getStartDateTime();
-				System.out.println("dateTime: "+dateTime);
 			}
-				
 			else
-				if(notificationsQueue.peek().getStartDateTime().equals(dateTime)) {
-					list.add(notificationsQueue.poll());
-			}
+				break;
+		}
+
+		System.out.println("list: "+list);
+
+		for (int i = 0; i < list.size(); i++) {
+			executor.execute(new Thread(list.get(i), userService, messagePushService));
 		}
 		
-		for (int i = 0; i < list.size(); i++) {
-			executorSlaves.execute(new ThreadSlave(list.get(i), userService, messagePushService));
-		}
+		if(!notificationsQueue.isEmpty())
+			createThread(notificationsQueue.peek().getStartDateTime());
+		else
+			dateTime = null;
+
 
 	};
 
-	
-	
-	
+
+
+
+
+
 }

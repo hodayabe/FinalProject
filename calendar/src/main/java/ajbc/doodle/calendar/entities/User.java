@@ -25,7 +25,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 
-@ToString
 @NoArgsConstructor
 @Getter
 @Setter
@@ -82,5 +81,16 @@ public class User {
 		this.loggedIn = 0;
 		
 	}
+
+
+	@Override
+	public String toString() {
+		return "User [userId=" + userId + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
+				+ ", birthDate=" + birthDate + ", joinDate=" + joinDate + ", isActive=" + isActive + ", loggedIn="
+				+ loggedIn + "]";
+	}
+	
+	
+	
 	
 }

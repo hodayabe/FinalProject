@@ -43,7 +43,7 @@ public class EventService {
 		user.setEvents(eventsList);
 		userDao.updateUser(user);
 		
-		notificationDao.addNotification(new Notification(event, user,event.getTitle(),event.getTitle(), Units.HOURS, 0));
+		notificationDao.addNotification( new Notification(event, user,event.getTitle(),event.getTitle(), Units.HOURS, 0));
 	}
 	
 	

@@ -110,7 +110,7 @@ public class HTUserDao implements UserDao {
 	@Override
 	public User hardDeleteUser(Integer userId) throws DaoException {
 		User us = getUser(userId);
-		 template.delete(userId);
+		 template.delete(us);
 		 return us;
 	}
 	

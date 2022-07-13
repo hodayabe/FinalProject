@@ -48,9 +48,8 @@ public class Notification {
 	
 	
 	@JsonIgnore
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name="userId")
-//	@JsonBackReference
 	private User user;
 	
 	private LocalDateTime startDateTime;
@@ -65,6 +64,10 @@ public class Notification {
 	
 	private int quantity;
 	
+	private Integer isActive;
+	
+	private Integer isTreated;
+	
 	
 	public Notification(Event event, User user, String title,String message, Units units, Integer qiantity) {
 		this.eventId=event.getEventId();
@@ -74,6 +77,8 @@ public class Notification {
 		this.title = title;
 		this.message = message;
 		this.units = units;
+		this.isActive = 1;
+		this.isTreated = 0;
 		this.quantity = qiantity;
 		if (units.equals(Units.HOURS))
 			this.startDateTime = event.getStartDateTime().minusHours(quantity);

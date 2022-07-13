@@ -26,11 +26,18 @@ public class NotificationService {
 	@Autowired
 	private UserDao userDao;
 
-	public void addNotification(Integer userId, Integer eventId, Notification notification) throws DaoException {
-		if (!userIsParticipant(eventId, userId))
-			throw new DaoException("This user is not participates in this event");
-		notification.setEvent(eventDao.getEvent(eventId));
-		notification.setUser(userDao.getUser(userId));
+//	public void addNotification(Integer userId, Integer eventId, Notification notification) throws DaoException {
+//		if (!userIsInEvent(eventId, userId))
+//			throw new DaoException("This user is not in this event");
+//		notification.setEvent(eventDao.getEvent(eventId));
+//		notification.setUser(userDao.getUser(userId));
+//		notificationDao.addNotification(notification);
+//	}
+	
+	
+	public void addNotification(Notification notification) throws DaoException {
+		notification.setEvent(eventDao.getEvent(notification.getEventId()));
+		notification.setUser(userDao.getUser(notification.getUserId()));
 		notificationDao.addNotification(notification);
 	}
 
@@ -42,16 +49,28 @@ public class NotificationService {
 	public List<Notification> getAllNotifications() throws DaoException {
 		return notificationDao.getAllNotifications();
 	}
+	
+	public List<Notification> getUntreatedNotifications() throws DaoException{
+		return  notificationDao.getUntreatedNotifications();
+	}
 
-	public void updateNotification(Notification not) throws DaoException {
-		notificationDao.updateNotification(not);
+	
+	
+	public Notification updateNotification(Notification notification) throws DaoException {
+		notification.setEvent(eventDao.getEvent(notification.getEventId()));
+		notification.setUser(userDao.getUser(notification.getUserId()));
+		notificationDao.updateNotification(notification);
+		
+		notification = notificationDao.getNotification(notification.getNotId());
+
+		return notification;
 	}
 	
 	
 	//TODO
-	private boolean userIsParticipant(int eventId, int userId) throws DaoException {
+	private boolean userIsInEvent(int eventId, int userId) throws DaoException {
 		Event event = eventDao.getEvent(eventId);
-		return event.getGuests().stream().map(User::getUserId).anyMatch(id -> id == userId);
+		return event.getGuests().stream().map(User::getUserId).anyMatch(id -> id == userId) || event.getOwnerId().equals(userId) ;
 	}
 	
 	

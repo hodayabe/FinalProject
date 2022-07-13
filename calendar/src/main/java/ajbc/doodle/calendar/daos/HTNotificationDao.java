@@ -4,12 +4,12 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.stereotype.Component;
 
 import ajbc.doodle.calendar.entities.Notification;
-import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.manager.NotificationManager;
 
 @SuppressWarnings("unchecked")
@@ -63,6 +63,13 @@ public class HTNotificationDao implements NotificationDao {
 	
 	
 	
+	@Override
+	public List<Notification> getUntreatedNotifications() throws DaoException {
+		DetachedCriteria criteria = DetachedCriteria.forClass(Notification.class);
+		criteria.add(Restrictions.eq("isTreated", 0));
+		
+		return (List<Notification>)template.findByCriteria(criteria);
+	}
 	
 	
 

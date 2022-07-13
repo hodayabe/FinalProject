@@ -111,6 +111,8 @@ public class HTEventDao implements EventDao {
 		return new ArrayList<Event>(returnEvents);
 	}
 
+	
+	
 
 	// check if the user is in the events
 	private boolean isUserInEvent(Event event, Integer userId) {
