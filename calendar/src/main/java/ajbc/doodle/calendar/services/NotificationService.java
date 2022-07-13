@@ -26,13 +26,6 @@ public class NotificationService {
 	@Autowired
 	private UserDao userDao;
 
-//	public void addNotification(Integer userId, Integer eventId, Notification notification) throws DaoException {
-//		if (!userIsInEvent(eventId, userId))
-//			throw new DaoException("This user is not in this event");
-//		notification.setEvent(eventDao.getEvent(eventId));
-//		notification.setUser(userDao.getUser(userId));
-//		notificationDao.addNotification(notification);
-//	}
 	
 	
 	public void addNotification(Notification notification) throws DaoException {
@@ -64,6 +57,15 @@ public class NotificationService {
 		notification = notificationDao.getNotification(notification.getNotId());
 
 		return notification;
+	}
+	
+	
+	public Notification softDeleteNotification(Integer id) throws DaoException {
+		return notificationDao.softDeleteNotification(id);
+	}
+
+	public Notification hardDeleteNotification(Integer userId) throws DaoException {
+		return notificationDao.hardDeleteNotification(userId);
 	}
 	
 	

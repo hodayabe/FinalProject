@@ -96,14 +96,19 @@ public class NotificationManager {
 		
 	}
 	
-	public void addQueue(Notification notification) {
+	public void addToQueue(Notification notification) {
 		notificationsQueue.add(notification);
 		if (dateTime == null || notification.getStartDateTime().isBefore(dateTime)) {
 			createThread(notification.getStartDateTime());
 		}
 	}
 
-
+	public void removeFromQueue(Notification notification) {
+		notificationsQueue.remove(notification);
+	}
+	
+	
+	
 
 	public Runnable queueManager = () -> {
 		List<Notification> list = new ArrayList<Notification>();
@@ -120,7 +125,7 @@ public class NotificationManager {
 		System.out.println("list: "+list);
 
 		for (int i = 0; i < list.size(); i++) {
-			executor.execute(new Thread(list.get(i), userService, messagePushService));
+			executor.execute(new Thread(list.get(i), userService, messagePushService,notificationService));
 		}
 		
 		if(!notificationsQueue.isEmpty())

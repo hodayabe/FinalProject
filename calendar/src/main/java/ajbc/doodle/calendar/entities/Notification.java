@@ -69,6 +69,7 @@ public class Notification {
 	private Integer isTreated;
 	
 	
+	
 	public Notification(Event event, User user, String title,String message, Units units, Integer qiantity) {
 		this.eventId=event.getEventId();
 		this.event = event;
@@ -87,6 +88,17 @@ public class Notification {
 		
 	}
 
+	
+	
+	public void Treated(boolean bool) {
+		if(bool)
+			this.isTreated = 1;
+		
+		else
+			this.isTreated = 1;
+	}
+	
+	
 
 	@Override
 	public String toString() {

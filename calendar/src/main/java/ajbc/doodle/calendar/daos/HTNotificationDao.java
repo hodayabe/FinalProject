@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.stereotype.Component;
 
+import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.manager.NotificationManager;
 
@@ -27,7 +28,7 @@ public class HTNotificationDao implements NotificationDao {
 	@Override
 	public void addNotification(Notification notification) throws DaoException {
 		template.persist(notification);
-		manager.addQueue(notification);
+		manager.addToQueue(notification);
 	}
 
 	@Override
@@ -71,6 +72,21 @@ public class HTNotificationDao implements NotificationDao {
 		return (List<Notification>)template.findByCriteria(criteria);
 	}
 	
+	
+	@Override
+	public Notification softDeleteNotification(Integer id) throws DaoException {
+		Notification not = getNotification(id);
+		not.setIsActive(0);
+		updateNotification(not);
+		return getNotification(id);
+	}
+
+	@Override
+	public Notification hardDeleteNotification(Integer id) throws DaoException {
+		Notification not = getNotification(id);
+		 template.delete(not);
+		 return not;
+	}
 	
 
 }

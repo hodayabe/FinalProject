@@ -16,9 +16,9 @@ import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.entities.webpush.PushMessage;
 import ajbc.doodle.calendar.services.MessagePushService;
+import ajbc.doodle.calendar.services.NotificationService;
 import ajbc.doodle.calendar.services.UserService;
 
-//@RestController
 public class Thread implements Runnable {
 	
 	private UserService userService;
@@ -27,11 +27,13 @@ public class Thread implements Runnable {
 	
 	private Notification notification;
 	
+	private NotificationService notificationService;
 	
-	public Thread(Notification notification, UserService userService, MessagePushService messagePushService ) {
+	public Thread(Notification notification, UserService userService, MessagePushService messagePushService ,NotificationService notificationService ) {
 		this.notification = notification;
 		this.userService = userService;
 		this.messagePushService = messagePushService;
+		this.notificationService = notificationService;
 	}
 
 	@Override
@@ -44,6 +46,8 @@ public class Thread implements Runnable {
 			messagePushService.sendPushMessage(user,
 					messagePushService.encryptMessage(user, new PushMessage("message: ", notification.toString())));
 			
+			notification.Treated(true);
+			notificationService.updateNotification(notification);
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

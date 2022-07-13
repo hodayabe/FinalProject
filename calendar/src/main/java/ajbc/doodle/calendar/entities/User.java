@@ -56,7 +56,7 @@ public class User {
 	
 //	@JsonProperty(access = Access.READ_ONLY)
 	@Fetch(FetchMode.JOIN)
-	@ManyToMany(mappedBy="guests",cascade = {CascadeType.MERGE,CascadeType.REFRESH})
+	@ManyToMany(mappedBy="guests",cascade = {CascadeType.MERGE,CascadeType.REFRESH,CascadeType.PERSIST})
 	@JsonIgnore
 	private Set<Event> events = new HashSet<Event>();
 	

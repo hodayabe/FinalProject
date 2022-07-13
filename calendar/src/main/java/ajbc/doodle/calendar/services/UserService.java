@@ -55,7 +55,7 @@ public class UserService {
 		return usres;
 	}
 
-	public User getUserByEmail(String email) throws DaoException {
+	public synchronized User getUserByEmail(String email) throws DaoException {
 		return userDao.getUserByEmail(email);
 	}
 	

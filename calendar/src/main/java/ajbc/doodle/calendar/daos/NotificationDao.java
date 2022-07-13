@@ -42,6 +42,15 @@ public interface NotificationDao {
 		throw new DaoException("Method not implemented");
 	}
 	
+	@Transactional(readOnly = false)
+	public default Notification softDeleteNotification(Integer id) throws DaoException{
+		throw new DaoException("Method not implemented");
+	}
+	
+	@Transactional(readOnly = false)
+	public default Notification hardDeleteNotification(Integer id) throws DaoException{
+		throw new DaoException("Method not implemented");
+	}
 	
 	
 	

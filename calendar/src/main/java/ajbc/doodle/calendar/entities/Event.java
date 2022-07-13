@@ -71,7 +71,7 @@ public class Event {
 	@Enumerated(EnumType.STRING)
 	private RepeatingOptions repeating;
 	
-	@JsonProperty(access = Access.AUTO)
+//	@JsonProperty(access = Access.AUTO)
 	@ManyToMany(fetch = FetchType.EAGER,cascade = {CascadeType.MERGE,CascadeType.REFRESH})
 	@JoinTable(name = "Users_Events", joinColumns = @JoinColumn(name = "eventId"), inverseJoinColumns = @JoinColumn(name = "userId"))
 //	@JsonManagedReference("guests")
