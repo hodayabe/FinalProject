@@ -62,8 +62,6 @@ public class NotificationController {
 			List<Notification> addedNotifications = new ArrayList<Notification>();
 
 			for (int i = 0; i < notifications.size(); i++) {
-//				notifications.get(i).setEventId(eventId);
-//				notifications.get(i).setUserId(userId);
 				notificationServcie.addNotification(notifications.get(i));
 
 				Notification notification = notificationServcie.getNotificationById(notifications.get(i).getNotId());

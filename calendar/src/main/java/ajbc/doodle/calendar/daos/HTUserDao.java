@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
@@ -53,7 +54,7 @@ public class HTUserDao implements UserDao {
 	@Override
 	public List<User> getAllUsers() throws DaoException {
 		DetachedCriteria criteria = DetachedCriteria.forClass(User.class);
-		return (List<User>)template.findByCriteria(criteria);
+		return (List<User>)template.findByCriteria(criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY));
 	}
 
 

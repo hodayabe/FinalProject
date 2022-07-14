@@ -1,5 +1,6 @@
 package ajbc.doodle.calendar.services;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -41,6 +42,7 @@ public class UserService {
 	}
 
 	public List<User> getAllUsers() throws DaoException {
+		Set<User> users=new HashSet<User>();
 		return userDao.getAllUsers();
 	}
 
@@ -69,11 +71,6 @@ public class UserService {
 	public User softDeleteUser(Integer userId) throws DaoException {
 		return userDao.softDeleteUser(userId);
 	}
-
-//	public User hardDeleteUser(Integer userId) throws DaoException {
-//		return userDao.hardDeleteUser(userId);
-//	}
-	
 	
 
 	public User hardDeleteUser(Integer userId) throws DaoException {
