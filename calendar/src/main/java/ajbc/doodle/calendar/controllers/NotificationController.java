@@ -1,6 +1,5 @@
 package ajbc.doodle.calendar.controllers;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.ErrorMessage;
 import ajbc.doodle.calendar.entities.Notification;
-import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.manager.NotificationManager;
 import ajbc.doodle.calendar.services.MessagePushService;
 import ajbc.doodle.calendar.services.NotificationService;
@@ -40,7 +38,6 @@ public class NotificationController {
 	
 	@Autowired(required = false)
 	private NotificationManager notificationManager;
-	
 	
 	
 	@PostMapping("/{userId}/{eventId}")

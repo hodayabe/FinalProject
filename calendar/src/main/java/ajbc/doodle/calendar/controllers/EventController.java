@@ -2,14 +2,20 @@ package ajbc.doodle.calendar.controllers;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.ErrorMessage;
 import ajbc.doodle.calendar.entities.Event;
+import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.services.EventService;
 import ajbc.doodle.calendar.services.UserService;
@@ -33,13 +40,18 @@ public class EventController {
 	@Autowired
 	UserService userService;
 
-	@RequestMapping(method = RequestMethod.POST, path = "/{id}")
-	public ResponseEntity<?> addEvent(@RequestBody Event event, @PathVariable Integer id) {
+	
+	
+	@PostMapping("/{id}")
+	public ResponseEntity<?> addEvent(@RequestBody List<Event> events, @PathVariable Integer id) {
 
+		List<Event> eventsList=new ArrayList<Event>();
 		try {
-			eventService.addEvent(event, id);
-			event = eventService.getEvent(event.getEventId());
-			return ResponseEntity.status(HttpStatus.CREATED).body(event);
+			for (Event event2 : events) {
+				eventService.addEvent(event2, id);
+				eventsList.add(eventService.getEvent(event2.getEventId()));
+			}
+			return ResponseEntity.status(HttpStatus.CREATED).body(eventsList);
 		} catch (DaoException e) {
 			ErrorMessage errorMessage = new ErrorMessage();
 			errorMessage.setData(e.getMessage());
@@ -47,6 +59,8 @@ public class EventController {
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errorMessage);
 		}
 	}
+	
+	
 
 	@RequestMapping(method = RequestMethod.GET, path = "/{id}")
 	public ResponseEntity<?> getEventById(@PathVariable Integer id) {
@@ -75,6 +89,7 @@ public class EventController {
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(e.getMessage());
 		}
 	}
+	
 
 	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity<?> getUserssIds(@RequestParam Map<String, String> map) throws DaoException {
@@ -137,26 +152,25 @@ public class EventController {
 	}
 
 	
-	@RequestMapping(method = RequestMethod.DELETE, path = "/{id}")
-	public ResponseEntity<Event> DeleteEvent(@PathVariable Integer id, @RequestParam Map<String, String> map)
+	@DeleteMapping
+	public ResponseEntity<List<Event>> DeleteEvent(@RequestBody List<Integer> eventsIds, @RequestParam Map<String, String> map)
 			throws DaoException {
 		Set<String> keys = map.keySet();
-		Event event = null;
+		List<Event> eventsList=new ArrayList<Event>();
 
 		if (keys.contains("soft"))
-			event = eventService.softDeleteEvent(id);
-
+			for (Integer evId : eventsIds) {
+				eventsList.add(eventService.softDeleteEvent(evId));
+			}
 		if (keys.contains("hard"))
-			event = eventService.hardDeleteEvent(id);
+			for (Integer evId : eventsIds) {
+				eventsList.add(eventService.hardDeleteEvent(evId));
+			}
+			
 
-		if (event == null)
-			return ResponseEntity.notFound().build();
-
-		return ResponseEntity.ok(event);
+		return ResponseEntity.ok(eventsList);
 	}
 
-	
-	
 	
 	
 }

@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.daos.EventDao;
+import ajbc.doodle.calendar.daos.NotificationDao;
 import ajbc.doodle.calendar.daos.UserDao;
 import ajbc.doodle.calendar.entities.Event;
+import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.entities.webpush.Subscription;
 
@@ -24,6 +26,10 @@ public class UserService {
 	@Autowired
 	@Qualifier("htEDao")
 	EventDao eventDao;
+	
+	@Autowired
+	@Qualifier("htNDao")
+	NotificationDao notificationDao;
 
 	public void addUser(User user) throws DaoException {
 		user.setIsActive(1);
@@ -64,9 +70,40 @@ public class UserService {
 		return userDao.softDeleteUser(userId);
 	}
 
+//	public User hardDeleteUser(Integer userId) throws DaoException {
+//		return userDao.hardDeleteUser(userId);
+//	}
+	
+	
+
 	public User hardDeleteUser(Integer userId) throws DaoException {
+
+		List<Event> listEvents = eventDao.getEventsByUser(userId);
+		for (int i = 0; i < listEvents.size(); i++) {
+			eventDao.hardDeleteEvent(listEvents.get(i).getEventId());
+		}
+		
+		User user = getUser(userId);
+		user.getEvents().forEach(event -> event.getGuests().remove(user));
+
+		userDao.updateUser(user);
+
+		List<Notification> notifications = notificationDao.getNotificationsByUserId(userId);
+		for (int i = 0; i < notifications.size(); i++) {
+			notificationDao.hardDeleteNotification(notifications.get(i).getNotId());
+		}
+
 		return userDao.hardDeleteUser(userId);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	
 	//log in 	

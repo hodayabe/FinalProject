@@ -40,10 +40,10 @@ public class SeedDB {
 
 	@EventListener
 	public void seed(ContextRefreshedEvent event) throws DaoException{
-		
-			seedUsersTable();
-			seedEventTable();
-			seedNotificationTable();
+//		
+//			seedUsersTable();
+//			seedEventTable();
+//			seedNotificationTable();
 	}
 
 

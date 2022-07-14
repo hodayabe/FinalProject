@@ -24,7 +24,6 @@ import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;
 import ajbc.doodle.calendar.services.MessagePushService;
 import ajbc.doodle.calendar.services.UserService;
 
-
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -78,8 +77,8 @@ public class UserController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity<?> getUsers(@RequestParam Map<String, String> map) throws DaoException {
-		List<User> userList=null;
-		Set <User> userSet=null;
+		List<User> userList = null;
+		Set<User> userSet = null;
 		Set<String> keys = map.keySet();
 		User user;
 
@@ -93,20 +92,18 @@ public class UserController {
 		else if (keys.contains("start") && keys.contains("end"))
 			userSet = service.getUsersWithEventInRange(map.get("start"), map.get("end"));
 
-		else if (keys.contains("eventId")) 
-			userSet =service.getUsersByEvent(Integer.parseInt(map.get("eventId")));		
-		
+		else if (keys.contains("eventId"))
+			userSet = service.getUsersByEvent(Integer.parseInt(map.get("eventId")));
+
 		else
 			userList = service.getAllUsers();
-		
-		
 
-		if (userList == null && userSet == null )
+		if (userList == null && userSet == null)
 			return ResponseEntity.notFound().build();
 
-		if(userSet !=null)
+		if (userSet != null)
 			return ResponseEntity.ok(userSet);
-		
+
 		return ResponseEntity.ok(userList);
 	}
 
@@ -140,6 +137,7 @@ public class UserController {
 		return ResponseEntity.ok(user);
 	}
 
+	
 	// login
 	@RequestMapping(method = RequestMethod.POST, path = "/login/{email}")
 	public ResponseEntity<?> login(@RequestBody Subscription subscription, @PathVariable(required = false) String email)
@@ -159,29 +157,27 @@ public class UserController {
 
 	}
 
-		@RequestMapping(method = RequestMethod.POST, path = "/logout/{email}")
-		public ResponseEntity<?> logout(@PathVariable(required = false) String email) throws DaoException {
-			try {
-				User user = service.getUserByEmail(email);
-				service.logout(user);
-				return ResponseEntity.ok().body("Logged out");
-			} catch (DaoException e) {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-			}
+	@RequestMapping(method = RequestMethod.POST, path = "/logout/{email}")
+	public ResponseEntity<?> logout(@PathVariable(required = false) String email) throws DaoException {
+		try {
+			User user = service.getUserByEmail(email);
+			service.logout(user);
+			return ResponseEntity.ok().body("Logged out");
+		} catch (DaoException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
-		
-		@PostMapping("/isSubscribed")
-		public boolean isSubscribed(@RequestBody SubscriptionEndpoint subscription) throws DaoException {
-			List<User> users = service.getAllUsers();
-			for(User user : users) {
-				if(user.getEndpoint() != null) {
-					if(user.getEndpoint().equals(subscription.getEndpoint()))
-						return true;
-				}
-			}
-			return false;
-		}
+	}
 
-	
+	@PostMapping("/isSubscribed")
+	public boolean isSubscribed(@RequestBody SubscriptionEndpoint subscription) throws DaoException {
+		List<User> users = service.getAllUsers();
+		for (User user : users) {
+			if (user.getEndpoint() != null) {
+				if (user.getEndpoint().equals(subscription.getEndpoint()))
+					return true;
+			}
+		}
+		return false;
+	}
 
 }

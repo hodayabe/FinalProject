@@ -89,6 +89,9 @@ public class User {
 				+ ", birthDate=" + birthDate + ", joinDate=" + joinDate + ", isActive=" + isActive + ", loggedIn="
 				+ loggedIn + "]";
 	}
+
+
+	
 	
 	
 	

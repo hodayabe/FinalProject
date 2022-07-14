@@ -3,6 +3,7 @@ package ajbc.doodle.calendar.daos;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,17 @@ public class HTNotificationDao implements NotificationDao {
 		return (List<Notification>)template.findByCriteria(criteria);
 	}
 	
+	
+	@Override
+	public List<Notification> getNotificationsByUserId(Integer userId) throws DaoException {
+		DetachedCriteria criteria = DetachedCriteria.forClass(Notification.class);
+		Criterion criterion1 = Restrictions.eq("userId", userId);
+		criteria.add(criterion1);
+		
+		List<Notification> notifications = (List<Notification>)template.findByCriteria(criteria);
+		
+		return notifications;
+	}
 	
 	@Override
 	public Notification softDeleteNotification(Integer id) throws DaoException {

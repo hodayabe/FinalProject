@@ -51,6 +51,10 @@ public interface NotificationDao {
 	public default Notification hardDeleteNotification(Integer id) throws DaoException{
 		throw new DaoException("Method not implemented");
 	}
+
+	public default List<Notification> getNotificationsByUserId(Integer userId) throws DaoException{
+		throw new DaoException("Method not implemented");
+	}
 	
 	
 	
