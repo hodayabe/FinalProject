@@ -1,6 +1,5 @@
 package ajbc.doodle.calendar.manager;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -24,7 +23,13 @@ import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.services.MessagePushService;
 import ajbc.doodle.calendar.services.NotificationService;
 import ajbc.doodle.calendar.services.UserService;
+import lombok.Getter;
+import lombok.Setter;
 
+
+
+@Getter
+@Setter
 @Component
 public class NotificationManager {
 
@@ -87,7 +92,7 @@ public class NotificationManager {
 	}
 	
 
-	private long timeToSleep(LocalDateTime dateTime) {
+	public long timeToSleep(LocalDateTime dateTime) {
 		long secondsToSleep = LocalDateTime.now().until(dateTime, ChronoUnit.SECONDS);
 		return secondsToSleep < 0 ? 0 : secondsToSleep;
 //		long sleep = Duration.between(LocalDateTime.now(),dateTime).getSeconds();
