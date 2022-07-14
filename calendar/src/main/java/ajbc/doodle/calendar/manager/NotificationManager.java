@@ -64,7 +64,6 @@ public class NotificationManager {
 			
 			List<Notification> nots = notificationService.getUntreatedNotifications();
 			notificationsQueue.addAll(nots);
-			
 			if(!notificationsQueue.isEmpty()) {
 				createThread(notificationsQueue.peek().getStartDateTime());
 			}

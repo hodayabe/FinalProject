@@ -62,8 +62,8 @@ public class NotificationController {
 			List<Notification> addedNotifications = new ArrayList<Notification>();
 
 			for (int i = 0; i < notifications.size(); i++) {
-				notifications.get(i).setEventId(eventId);
-				notifications.get(i).setUserId(userId);
+//				notifications.get(i).setEventId(eventId);
+//				notifications.get(i).setUserId(userId);
 				notificationServcie.addNotification(notifications.get(i));
 
 				Notification notification = notificationServcie.getNotificationById(notifications.get(i).getNotId());
@@ -82,6 +82,11 @@ public class NotificationController {
 	
 	
 	
+	/**
+	 * Returns the notification with this id.
+	 * @param id
+	 * @return
+	 */
 	@RequestMapping(method = RequestMethod.GET, path = "/{id}")
 	public ResponseEntity<?> getNotificationById(@PathVariable Integer id) {
 
@@ -98,6 +103,13 @@ public class NotificationController {
 	}
 	
 	
+	
+	/**
+	 * 
+	 * @param map
+	 * @return
+	 * @throws DaoException
+	 */
 	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity<?> getNotifications(@RequestParam Map<String, String> map) throws DaoException {
 		List<Notification> notList=null;
@@ -116,6 +128,9 @@ public class NotificationController {
 		
 		return ResponseEntity.ok(notList);
 	}
+	
+	
+	
 	
 
 			@RequestMapping(method = RequestMethod.PUT)
