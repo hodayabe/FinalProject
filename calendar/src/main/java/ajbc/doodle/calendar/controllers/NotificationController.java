@@ -25,31 +25,29 @@ import ajbc.doodle.calendar.manager.NotificationManager;
 import ajbc.doodle.calendar.services.MessagePushService;
 import ajbc.doodle.calendar.services.NotificationService;
 
-
-
 /**
- * Restful api service that receives http requests about existed Notifications in the calendar.
+ * Restful api service that receives http requests about existed Notifications
+ * in the calendar.
+ * 
  * @author Hodaya David
  *
  */
 @RequestMapping("/notifications")
 @RestController
 public class NotificationController {
-	
+
 	@Autowired
 	private NotificationService notificationServcie;
-	
-	
+
 	@Autowired
 	private MessagePushService messagePushService;
-	
+
 	@Autowired(required = false)
 	private NotificationManager notificationManager;
-	
-	
-	
+
 	/**
 	 * Adds list of new notifications of an user and of event to the database
+	 * 
 	 * @param notifications
 	 * @param userId
 	 * @param eventId
@@ -77,11 +75,10 @@ public class NotificationController {
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errorMessage);
 		}
 	}
-	
-	
-	
+
 	/**
 	 * Returns the notification with this id.
+	 * 
 	 * @param id
 	 * @return
 	 */
@@ -99,10 +96,10 @@ public class NotificationController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
 		}
 	}
-	
-	
-	
+
 	/**
+	 * get Notifications by params: eventId: get Notifications By Event no params:
+	 * get All Notifications
 	 * 
 	 * @param map
 	 * @return
@@ -110,86 +107,87 @@ public class NotificationController {
 	 */
 	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity<?> getNotifications(@RequestParam Map<String, String> map) throws DaoException {
-		List<Notification> notList=null;
+		List<Notification> notList = null;
 
 		Set<String> keys = map.keySet();
 
-		if (keys.contains("eventId")) 
-			notList = notificationServcie.getNotificationsByEvent(Integer.parseInt(map.get("eventId")));		
-		
+		if (keys.contains("eventId"))
+			notList = notificationServcie.getNotificationsByEvent(Integer.parseInt(map.get("eventId")));
+
 		else
 			notList = notificationServcie.getAllNotifications();
-		
-		if (notList == null )
+
+		if (notList == null)
 			return ResponseEntity.notFound().build();
 
-		
 		return ResponseEntity.ok(notList);
 	}
-	
-	
-	
-	
 
-			@RequestMapping(method = RequestMethod.PUT)
-			public ResponseEntity<?> updateListNotifications(@RequestBody List<Notification> notifications) {
-				Notification not;
-				List<Notification> addedNotifications = new ArrayList<Notification>();
-				try {
-					for (int i = 0; i < notifications.size(); i++) {
-						notificationManager.removeFromQueue(notificationServcie.getNotificationById(notifications.get(i).getNotId()));
-						notificationServcie.updateNotification(notifications.get(i));
-						not= notificationServcie.getNotificationById(notifications.get(i).getNotId());
-						notificationManager.addToQueue(notifications.get(i));
-						addedNotifications.add(not);
-					}
-					return ResponseEntity.status(HttpStatus.OK).body(addedNotifications);
-				} catch (DaoException e) {
-					ErrorMessage errorMessage = new ErrorMessage();
-					errorMessage.setData(e.getMessage());
-					errorMessage.setMessage("failed to update user in db");
-					return ResponseEntity.status(HttpStatus.valueOf(500)).body(errorMessage);
-				}
+	/**
+	 * update list of Notifications
+	 * @param notifications
+	 * @return
+	 */
+	@RequestMapping(method = RequestMethod.PUT)
+	public ResponseEntity<?> updateListNotifications(@RequestBody List<Notification> notifications) {
+		Notification not;
+		List<Notification> addedNotifications = new ArrayList<Notification>();
+		try {
+			for (int i = 0; i < notifications.size(); i++) {
+				notificationManager
+						.removeFromQueue(notificationServcie.getNotificationById(notifications.get(i).getNotId()));
+				notificationServcie.updateNotification(notifications.get(i));
+				not = notificationServcie.getNotificationById(notifications.get(i).getNotId());
+				notificationManager.addToQueue(notifications.get(i));
+				addedNotifications.add(not);
 			}
-			
-			
-			
-			
-			
-			@DeleteMapping
-			public ResponseEntity<List<Notification>> DeleteNotification(@RequestBody List<Integer> notificationIds, @RequestParam Map<String, String> map)
-					throws DaoException {
-				Set<String> keys = map.keySet();
-				List<Notification> notsList=new ArrayList<Notification>();
+			return ResponseEntity.status(HttpStatus.OK).body(addedNotifications);
+		} catch (DaoException e) {
+			ErrorMessage errorMessage = new ErrorMessage();
+			errorMessage.setData(e.getMessage());
+			errorMessage.setMessage("failed to update user in db");
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errorMessage);
+		}
+	}
 
-				if (keys.contains("soft"))
-					for (Integer notId : notificationIds) {
-						notsList.add(notificationServcie.softDeleteNotification(notId));
-					}
+	
+	/**
+	 * Delete Notification by list of ids
+	 * soft: update isActive to false
+	 * hard:delete from db
+	 * @param notificationIds
+	 * @param map
+	 * @return
+	 * @throws DaoException
+	 */
+	@DeleteMapping
+	public ResponseEntity<List<Notification>> DeleteNotification(@RequestBody List<Integer> notificationIds,
+			@RequestParam Map<String, String> map) throws DaoException {
+		Set<String> keys = map.keySet();
+		List<Notification> notsList = new ArrayList<Notification>();
 
-				if (keys.contains("hard"))
-					for (Integer notId : notificationIds) {
-						notsList.add(notificationServcie.hardDeleteNotification(notId));
-					}
-					
-				return ResponseEntity.ok(notsList);
+		if (keys.contains("soft"))
+			for (Integer notId : notificationIds) {
+				notsList.add(notificationServcie.softDeleteNotification(notId));
 			}
-			
-			
-			
-			
-	
-	
-	//push controller methods
-		@GetMapping(path = "/publicSigningKey", produces = "application/octet-stream")
-		public byte[] publicSigningKey() {
-			return messagePushService.getServerKeys().getPublicKeyUncompressed();
-		}
 
-		@GetMapping(path = "/publicSigningKeyBase64")
-		public String publicSigningKeyBase64() {
-			return messagePushService.getServerKeys().getPublicKeyBase64();
-		}
+		if (keys.contains("hard"))
+			for (Integer notId : notificationIds) {
+				notsList.add(notificationServcie.hardDeleteNotification(notId));
+			}
+
+		return ResponseEntity.ok(notsList);
+	}
 
 	
+	@GetMapping(path = "/publicSigningKey", produces = "application/octet-stream")
+	public byte[] publicSigningKey() {
+		return messagePushService.getServerKeys().getPublicKeyUncompressed();
+	}
+
+	@GetMapping(path = "/publicSigningKeyBase64")
+	public String publicSigningKeyBase64() {
+		return messagePushService.getServerKeys().getPublicKeyBase64();
+	}
+
 }

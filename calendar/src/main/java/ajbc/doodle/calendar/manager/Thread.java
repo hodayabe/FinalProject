@@ -36,6 +36,7 @@ public class Thread implements Runnable {
 		this.notificationService = notificationService;
 	}
 
+	
 	@Override
 	public void run() {
 		try {

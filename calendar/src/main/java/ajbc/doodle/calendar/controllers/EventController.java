@@ -30,6 +30,12 @@ import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.services.EventService;
 import ajbc.doodle.calendar.services.UserService;
 
+
+/**
+ * Restful api service that receives http requests about existed events in the calendar.
+ * @author Hodaya David
+ *
+ */
 @RequestMapping("/events")
 @RestController
 public class EventController {
@@ -41,7 +47,12 @@ public class EventController {
 	UserService userService;
 
 	
-	
+	/**
+	 * add list of events to db
+	 * @param events
+	 * @param id
+	 * @return
+	 */
 	@PostMapping("/{id}")
 	public ResponseEntity<?> addEvent(@RequestBody List<Event> events, @PathVariable Integer id) {
 
@@ -62,6 +73,11 @@ public class EventController {
 	
 	
 
+	/**
+	 * get Event By Id
+	 * @param id
+	 * @return
+	 */
 	@RequestMapping(method = RequestMethod.GET, path = "/{id}")
 	public ResponseEntity<?> getEventById(@PathVariable Integer id) {
 
@@ -78,6 +94,12 @@ public class EventController {
 	}
 
 
+	/**
+	 * update Event
+	 * @param event
+	 * @param eventId
+	 * @return
+	 */
 	@RequestMapping(method = RequestMethod.PUT, path = "/{eventId}")
 	public ResponseEntity<?> updateEvent(@RequestBody Event event, @PathVariable Integer eventId) {
 		try {
@@ -91,8 +113,17 @@ public class EventController {
 	}
 	
 
+	/**
+	 * get Users by params:
+	 * userId-upcoming: get Upcoming Events
+	 * start-end:get Events In Range
+	 * no param: get all Users
+	 * @param map
+	 * @return
+	 * @throws DaoException
+	 */
 	@RequestMapping(method = RequestMethod.GET)
-	public ResponseEntity<?> getUserssIds(@RequestParam Map<String, String> map) throws DaoException {
+	public ResponseEntity<?> getUsers(@RequestParam Map<String, String> map) throws DaoException {
 
 		Set<String> keys = map.keySet();
 		User user = null;
@@ -152,6 +183,15 @@ public class EventController {
 	}
 
 	
+	/**
+	 * Delete Events by params:
+	 * soft: update isActiv to false
+	 * hard: delete from db
+	 * @param eventsIds
+	 * @param map
+	 * @return
+	 * @throws DaoException
+	 */
 	@DeleteMapping
 	public ResponseEntity<List<Event>> DeleteEvent(@RequestBody List<Integer> eventsIds, @RequestParam Map<String, String> map)
 			throws DaoException {

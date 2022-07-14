@@ -1,6 +1,5 @@
 package ajbc.doodle.calendar.controllers;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +35,11 @@ import javax.crypto.NoSuchPaddingException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+/**
+ * Restful api service that receives http requests about existed users in the calendar.
+ * @author Hodaya David
+ *
+ */
 @RequestMapping("/users")
 @RestController
 public class UserController {
@@ -46,6 +50,13 @@ public class UserController {
 	@Autowired
 	MessagePushService messagePushService;
 
+	
+	
+/**
+ * add users to DB
+ * @param user
+ * @return
+ */
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity<?> addUser(@RequestBody User user) {
 
@@ -61,6 +72,13 @@ public class UserController {
 		}
 	}
 
+	
+	
+	/**
+	 * get user from db by id in the path
+	 * @param id
+	 * @return
+	 */
 	@RequestMapping(method = RequestMethod.GET, path = "/{id}")
 	public ResponseEntity<?> getUserById(@PathVariable Integer id) {
 
@@ -75,7 +93,19 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
 		}
 	}
+	
+	
 
+	/**
+	 * get users by param:
+	 *  1 email: get user by email
+	 *  2 eventId : get users By EventId
+	 *  3 start-end : get Users With Event In Range
+	 *  in case there is no param the method return the all users
+	 * @param map
+	 * @return
+	 * @throws DaoException
+	 */
 	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity<?> getUsers(@RequestParam Map<String, String> map) throws DaoException {
 		List<User> userList = null;
@@ -108,6 +138,13 @@ public class UserController {
 		return ResponseEntity.ok(userList);
 	}
 
+	
+	/**
+	 * update User by id
+	 * @param user
+	 * @param id
+	 * @return
+	 */
 	@RequestMapping(method = RequestMethod.PUT, path = "/{id}")
 	public ResponseEntity<?> updateUser(@RequestBody User user, @PathVariable Integer id) {
 		try {
@@ -120,6 +157,16 @@ public class UserController {
 		}
 	}
 
+	
+	/**
+	 * Delete User by params:
+	 * soft: change the isActive to false
+	 * hard: delete from db
+	 * @param id
+	 * @param map
+	 * @return
+	 * @throws DaoException
+	 */
 	@RequestMapping(method = RequestMethod.DELETE, path = "/{id}")
 	public ResponseEntity<User> DeleteUser(@PathVariable Integer id, @RequestParam Map<String, String> map)
 			throws DaoException {
@@ -140,6 +187,21 @@ public class UserController {
 
 	
 	// login
+	/**
+	 * get email and update the user logIn to true and update thesubscriptionsData
+	 * @param subscription
+	 * @param email
+	 * @return
+	 * @throws DaoException
+	 * @throws InvalidKeyException
+	 * @throws JsonProcessingException
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException
+	 * @throws InvalidAlgorithmParameterException
+	 * @throws NoSuchPaddingException
+	 * @throws IllegalBlockSizeException
+	 * @throws BadPaddingException
+	 */
 	@RequestMapping(method = RequestMethod.POST, path = "/login/{email}")
 	public ResponseEntity<?> login(@RequestBody Subscription subscription, @PathVariable(required = false) String email)
 			throws DaoException, InvalidKeyException, JsonProcessingException, NoSuchAlgorithmException,
@@ -158,6 +220,12 @@ public class UserController {
 
 	}
 
+	/**
+	 * get email and update the isLogin to false and update thesubscriptionsData to null
+	 * @param email
+	 * @return
+	 * @throws DaoException
+	 */
 	@RequestMapping(method = RequestMethod.POST, path = "/logout/{email}")
 	public ResponseEntity<?> logout(@PathVariable(required = false) String email) throws DaoException {
 		try {
@@ -169,6 +237,12 @@ public class UserController {
 		}
 	}
 
+	/**
+	 * Get SubscriptionEndpoint and return if the user is already subscribe
+	 * @param subscription
+	 * @return
+	 * @throws DaoException
+	 */
 	@PostMapping("/isSubscribed")
 	public boolean isSubscribed(@RequestBody SubscriptionEndpoint subscription) throws DaoException {
 		List<User> users = service.getAllUsers();
