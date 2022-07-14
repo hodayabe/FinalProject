@@ -25,6 +25,13 @@ import ajbc.doodle.calendar.manager.NotificationManager;
 import ajbc.doodle.calendar.services.MessagePushService;
 import ajbc.doodle.calendar.services.NotificationService;
 
+
+
+/**
+ * Restful api service that receives http requests about existed Notifications in the calendar.
+ * @author Hodaya David
+ *
+ */
 @RequestMapping("/notifications")
 @RestController
 public class NotificationController {
@@ -40,6 +47,14 @@ public class NotificationController {
 	private NotificationManager notificationManager;
 	
 	
+	
+	/**
+	 * Adds list of new notifications of an user and of event to the database
+	 * @param notifications
+	 * @param userId
+	 * @param eventId
+	 * @return
+	 */
 	@PostMapping("/{userId}/{eventId}")
 	public ResponseEntity<?> addNotification(@RequestBody List<Notification> notifications,
 			@PathVariable Integer userId, @PathVariable Integer eventId) {
